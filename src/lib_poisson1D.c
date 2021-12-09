@@ -33,7 +33,7 @@ void printMatrix(double* AB, int* lab, int* la, int row) {
 
 void set_GB_operator_rowMajor_poisson1D(double* AB, int* lab, int* la,
                                         int* kv) {
-    printf("> set_GB_operator_rowMajor_poisson1D()\n");
+    // printf("> set_GB_operator_rowMajor_poisson1D()\n");
     size_t offset = *kv * (*la);
     for (size_t i = 0; i < *lab; i++) {
         for (size_t o = 0; o < offset; o++) AB[o] = .0;
@@ -43,8 +43,8 @@ void set_GB_operator_rowMajor_poisson1D(double* AB, int* lab, int* la,
         for (size_t j = 0; j < *la - 1; j++) AB[offset + *la * 2 + j] = -1.0;
         AB[*la * (*lab) - 1] = .0;
     }
-    printf("< set_GB_operator_rowMajor_poisson1D()\n");
-    printMatrix(AB, lab, la, 1);
+    // printf("< set_GB_operator_rowMajor_poisson1D()\n");
+    // printMatrix(AB, lab, la, 1);
 }
 
 void set_GB_operator_colMajor_poisson1D(double* AB, int* lab, int* la,
