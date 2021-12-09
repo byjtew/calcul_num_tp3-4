@@ -10,7 +10,7 @@
 #include <limits.h>
 #include "blaslapack_headers.h"
 
-void set_GB_operator_rowMajor_poisson1D(double* AB, int* lab, int *la);
+void set_GB_operator_rowMajor_poisson1D(double* AB, int* lab, int *la, int *kv);
 void set_GB_operator_colMajor_poisson1D(double* AB, int* lab, int *la, int *kv);
 void set_GB_operator_colMajor_poisson1D_Id(double* AB, int* lab, int *la, int *kv);
 void set_dense_RHS_DBC_1D(double* RHS, int* la, double* BC0, double* BC1);
@@ -25,3 +25,5 @@ double eigmax_poisson1D(int *la);
 double eigmin_poisson1D(int *la);
 double richardson_alpha_opt(int *la);
 void richardson_alpha(double *AB, double *RHS, double *X, double *alpha_rich, int *lab, int *la,int *ku, int*kl, double *tol, int *maxit);
+
+void printMatrix(double* AB, int *lab, int *la, int row);

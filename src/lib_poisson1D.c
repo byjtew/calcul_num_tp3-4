@@ -5,10 +5,48 @@
 /**********************************************/
 #include "lib_poisson1D.h"
 
-void set_GB_operator_rowMajor_poisson1D(double* AB, int *lab, int *la){
+void printMatrix(double* AB, int* lab, int* la, int row) {
+    if (row == 1) {
+        printf("[\n");
+        for (size_t i = 0; i < *lab; i++) {
+            for (size_t j = 0; j < *la; j++) printf("%lf, ", AB[i * (*la) + j]);
+            printf("\n");
+        }
+        printf("]\n\n");
+    } else {
+        printf("[\n");
+        for (size_t i = 0; i < *la; i++) {
+            for (size_t j = 0; j < *lab; j++)
+                printf("%lf, ", AB[i * (*lab) + j]);
+            printf("\n");
+        }
+        printf("]\n");
+    }
 
-  //TODO
+    // printf("[\n");
+    // for (size_t i = 0; i < *lab * *la; i++) {
+    //     printf("%lf, ", AB[i]);
+    //     // printf("");
+    // }
+    // printf("]\n\n");
 }
+
+void set_GB_operator_rowMajor_poisson1D(double* AB, int* lab, int* la,
+                                        int* kv) {
+    printf("> set_GB_operator_rowMajor_poisson1D()\n");
+    size_t offset = *kv * (*la);
+    for (size_t i = 0; i < *lab; i++) {
+        for (size_t o = 0; o < offset; o++) AB[o] = .0;
+        AB[offset] = .0;
+        for (size_t j = 1; j < *la; j++) AB[offset + j] = -1.0;
+        for (size_t j = 0; j < *la; j++) AB[offset + *la + j] = 2.0;
+        for (size_t j = 0; j < *la - 1; j++) AB[offset + *la * 2 + j] = -1.0;
+        AB[*la * (*lab) - 1] = .0;
+    }
+    printf("< set_GB_operator_rowMajor_poisson1D()\n");
+    printMatrix(AB, lab, la, 1);
+}
+
 void set_GB_operator_colMajor_poisson1D(double* AB, int *lab, int *la, int *kv){
   int ii, jj, kk;
   for (jj=0;jj<(*la);jj++){
