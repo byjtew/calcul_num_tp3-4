@@ -13,12 +13,13 @@ CC=gcc
 # 
 # -- Compiler Option
 #
-OPTC=-O3 -fomit-frame-pointer -fPIC -mavx -DAdd_ -DF77_INTEGER=int -DStringSunStyle
+OPTC=-O3 -Wall -fomit-frame-pointer -fPIC -mavx -DAdd_ -DF77_INTEGER=int -DStringSunStyle
 
 #
 # -- Directories
 TPDIR=.
 TPDIRSRC=$(TPDIR)/src
+TPDIRTESTS=$(TPDIR)/tests
 
 #
 # -- librairies
@@ -38,7 +39,7 @@ OBJTP2ITER= lib_poisson1D.o tp2_poisson1D_iter.o
 OBJTP2DIRECT= lib_poisson1D.o tp2_poisson1D_direct.o
 #
 
-all: bin/tp_testenv bin/tp2poisson1D_iter bin/tp2poisson1D_direct
+all: bin/tp_testenv bin/tp2poisson1D_iter bin/tp2poisson1D_direct check
 
 testenv: bin/tp_testenv
 
@@ -67,6 +68,22 @@ bin/tp2poisson1D_iter: $(OBJTP2ITER)
 bin/tp2poisson1D_direct: $(OBJTP2DIRECT)
 	$(CC) -o bin/tp2poisson1D_direct $(OPTC) $(OBJTP2DIRECT) $(LIBS)
 
+
+
+# TESTS
+
+check: 
+	make poisson_row_col_major
+
+poisson_row_col_major.o: $(TPDIRTESTS)/poisson_row_col_major.c
+	$(CC) $(OPTC) -c $(INCL) $(TPDIRTESTS)/poisson_row_col_major.c  
+
+poisson_row_col_major: lib_poisson1D.o poisson_row_col_major.o
+	$(CC) -o bin/tests/poisson_row_col_major $(OPTC) lib_poisson1D.o poisson_row_col_major.o $(LIBS)
+
+
+# == #
+
 run_testenv:
 	bin/tp_testenv
 
@@ -77,4 +94,4 @@ run_tp2poisson1D_direct:
 	bin/tp2poisson1D_direct
 
 clean:
-	rm *.o bin/*
+	rm *.o bin/tests/* bin/* 
