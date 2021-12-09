@@ -2,3 +2,5 @@
 .vscode/
 *.o
 bin/
+*.dat
+*.txt
