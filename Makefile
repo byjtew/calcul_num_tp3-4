@@ -39,7 +39,7 @@ OBJTP2ITER= lib_poisson1D.o tp2_poisson1D_iter.o
 OBJTP2DIRECT= lib_poisson1D.o tp2_poisson1D_direct.o
 #
 
-all: bin/tp_testenv bin/tp2poisson1D_iter bin/tp2poisson1D_direct check
+all: bin/tp_testenv bin/tp2poisson1D_iter bin/tp2poisson1D_direct bin/tp4_ex5 check
 
 testenv: bin/tp_testenv
 
@@ -69,6 +69,8 @@ bin/tp2poisson1D_direct: $(OBJTP2DIRECT)
 	$(CC) -o bin/tp2poisson1D_direct $(OPTC) $(OBJTP2DIRECT) $(LIBS)
 
 
+bin/tp4_ex5: $(TPDIRSRC)/TP4_ex5.c
+	$(CC) -o bin/tp4_ex5 $(TPDIRSRC)/TP4_ex5.c -O3 -Wall
 
 # TESTS
 
@@ -79,7 +81,7 @@ poisson_row_col_major.o: $(TPDIRTESTS)/poisson_row_col_major.c
 	$(CC) $(OPTC) -c $(INCL) $(TPDIRTESTS)/poisson_row_col_major.c  
 
 poisson_row_col_major: lib_poisson1D.o poisson_row_col_major.o
-	$(CC) -o bin/tests/poisson_row_col_major $(OPTC) lib_poisson1D.o poisson_row_col_major.o $(LIBS)
+	$(CC) -o bin/poisson_row_col_major $(OPTC) lib_poisson1D.o poisson_row_col_major.o $(LIBS)
 
 
 # == #
@@ -94,4 +96,4 @@ run_tp2poisson1D_direct:
 	bin/tp2poisson1D_direct
 
 clean:
-	rm *.o bin/tests/* bin/* 
+	rm *.o bin/* 
