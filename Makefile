@@ -13,7 +13,7 @@ CC=gcc
 # 
 # -- Compiler Option
 #
-OPTC=-O3 -Wall -fomit-frame-pointer -fPIC -mavx -DAdd_ -DF77_INTEGER=int -DStringSunStyle
+OPTC=-O3 -Wall -fomit-frame-pointer -fPIC -mavx -DAdd_ -DF77_INTEGER=int -DStringSunStyle -fopenmp
 
 #
 # -- Directories
@@ -70,7 +70,8 @@ bin/tp2poisson1D_direct: $(OBJTP2DIRECT)
 
 
 bin/tp4_ex5: $(TPDIRSRC)/TP4_ex5.c
-	$(CC) -o bin/tp4_ex5 $(TPDIRSRC)/TP4_ex5.c -O3 -Wall
+	$(CC) -o bin/tp4_ex5 $(TPDIRSRC)/TP4_ex5.c $(OPTC)
+
 
 # TESTS
 

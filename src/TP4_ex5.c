@@ -1,11 +1,12 @@
 #include <float.h>
 #include <math.h>
+#include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
 #define NULL_VALUE 0.0
-#define TEST_DIMENSION 9  // Must be a multiple of 3
+#define TEST_DIMENSION 5000  // Must be a multiple of 3
 
 //
 double randreal() {
@@ -145,6 +146,7 @@ void mat_csr_t_dot_vec(mat_csr_t* mat, size_t n, double* vec, double* res_vec) {
 }
 
 int main(int argc, char** argv) {
+    double start = 0, end = 0;
     double res_vector[TEST_DIMENSION] = {.0};
     double* res_vector_ptr = res_vector;
 
@@ -170,30 +172,45 @@ int main(int argc, char** argv) {
     print_vec(res_vec_ptr, 5);
 
     // RANDOM MATRIX PART
-    printf("\n\n--- Random generated [12x12] matrix ---\n");
+    printf("\n\n--- Random generated [%dx%d] matrix ---\n", TEST_DIMENSION, TEST_DIMENSION);
     srand(time(NULL));
     mat_csr_t random_csr = create_random_csr_t(TEST_DIMENSION, .75);
-    print_mat_csr_t(&random_csr);
-    print_mat_csr_t_full(&random_csr);
 
     // Question 1:
     printf("\n--- Question 1: Vector.ONE ---\n");
-    double one_vec[TEST_DIMENSION] = {1.0, 1, 1, 1, 1, 1, 1, 1, 1};
+    double one_vec[TEST_DIMENSION];
     double* one_vec_ptr = one_vec;
-    print_vec(one_vec_ptr, TEST_DIMENSION);
+    for (unsigned i = 0; i < TEST_DIMENSION; i++)
+        one_vec[i] = i % 3 == 0 ? 1 : 0;
+
+    // print_vec(one_vec_ptr, TEST_DIMENSION);
     for (size_t i = 0; i < TEST_DIMENSION; i++) res_vector_ptr[i] = .0;
-    mat_csr_t_dot_vec(&saad_csr, 5, two_vec_ptr, res_vector_ptr);
-    print_vec(res_vector_ptr, TEST_DIMENSION);
+    printf("\n-- Random [%dx%d] CSR matrix DOT Vector (1, 1, ...., 1)[%d] --\n",
+           TEST_DIMENSION, TEST_DIMENSION, TEST_DIMENSION);
+    start = omp_get_wtime();
+    mat_csr_t_dot_vec(&random_csr, TEST_DIMENSION, one_vec_ptr, res_vector_ptr);
+    // print_vec(res_vector_ptr, TEST_DIMENSION);
+    end = omp_get_wtime();
+    printf("-- Took %lf ms --\n", 1e3 * (end - start));
 
     // Question 2:
     printf("\n--- Question 2: Vector.ONE_ZERO_ZERO ---\n");
-    double one_zero_zero_vec[TEST_DIMENSION] = {1.0, 0,   0, 1.0, 0,
-                                                0,   1.0, 0, 0};
+    double one_zero_zero_vec[TEST_DIMENSION];
+    for (unsigned i = 0; i < TEST_DIMENSION; i++)
+        one_zero_zero_vec[i] = i % 3 == 0 ? 1 : 0;
     double* one_zero_zero_vec_ptr = one_zero_zero_vec;
-    print_vec(one_zero_zero_vec_ptr, TEST_DIMENSION);
+    // print_vec(one_zero_zero_vec_ptr, TEST_DIMENSION);
     for (size_t i = 0; i < TEST_DIMENSION; i++) res_vector_ptr[i] = .0;
-    mat_csr_t_dot_vec(&saad_csr, 5, two_vec_ptr, res_vector_ptr);
-    print_vec(res_vector_ptr, TEST_DIMENSION);
+    printf(
+        "\n-- Random [%dx%d] CSR matrix DOT Vector (1, 0, 0, 1, 0, 0, ...., 1, "
+        "0, 0)[%d] --\n",
+        TEST_DIMENSION, TEST_DIMENSION, TEST_DIMENSION);
+    start = omp_get_wtime();
+    mat_csr_t_dot_vec(&random_csr, TEST_DIMENSION, one_zero_zero_vec_ptr,
+                      res_vector_ptr);
+    // print_vec(res_vector_ptr, TEST_DIMENSION);
+    end = omp_get_wtime();
+    printf("-- Took %lf ms --\n", 1e3 * (end - start));
 
     // End of the program
     free_mat_csr_t(&random_csr);
