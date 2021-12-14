@@ -72,6 +72,8 @@ bin/tp2poisson1D_direct: $(OBJTP2DIRECT)
 bin/tp4_ex5: $(TPDIRSRC)/TP4_ex5.c
 	$(CC) -o bin/tp4_ex5 $(TPDIRSRC)/TP4_ex5.c $(OPTC)
 
+bin/tp4_ex1: $(TPDIRSRC)/TP4_ex1.sci
+	scilab-cli -f $(TPDIRSRC)/TP4_ex1.sci -quit
 
 # TESTS
 
@@ -97,4 +99,4 @@ run_tp2poisson1D_direct:
 	bin/tp2poisson1D_direct
 
 clean:
-	rm *.o bin/* 
+	rm *.o bin/*  *.dat
