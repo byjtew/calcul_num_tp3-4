@@ -41,7 +41,6 @@ void tri_diag_matrix_from_dense_rowMajor(real *A_tri_diag, real *A_dense,
         *(lb_ptr + i) = A_dense[n + i * n + i];
     }
     *(d_ptr + n - 1) = A_dense[n * n - 1];
-    print_tri_diag_matrix(A_tri_diag, n);
 }
 
 void tri_diag_matrix_from_dense_colMajor(real *A_tri_diag, real *A_dense,
@@ -52,7 +51,6 @@ void tri_diag_matrix_from_dense_colMajor(real *A_tri_diag, real *A_dense,
         A_tri_diag[i * 3 + 2] = A_dense[(i + 1) * n + i];
     }
     A_tri_diag[(n - 1) * 3 + 1] = A_dense[n * n - 1];
-    print_tri_diag_matrix(A_tri_diag, n);
 }
 
 void tri_diag_matrix_from_dense(CBLAS_ORDER major, real *A_tri_diag,
@@ -70,23 +68,26 @@ void random_dense_matrix(size_t n, real *A_dense) {
         A_dense[(i + 1) * n + i] = (real)rand() / (real)RAND_MAX;
     }
     A_dense[n * n - 1] = randreal();
-
-    print_dense_matrix(A_dense, n);
 }
 
 int main(int argc, char *argv[]) {
-    int la = 64;
+    size_t la = argc > 1 ? atol(argv[1]) : 8;
     int ku = 1, kl = 1, kv = 0, lab = 0;
     CBLAS_ORDER blas_order = CblasColMajor;
+
+    if (argc < 2)
+        printf(
+            "[USAGE]: %s [optional: leading dimension of the matrix, "
+            "default: 10]\n\n", argv[0]);
 
     lab = kv + kl + ku + 1;
 
     printf(
-        "=== Generation of a random (%dx%d) matrix (dense & tri_diagonal "
+        "=== Generation of a random (%ldx%ld) matrix (dense & tri_diagonal "
         "formats) ===\n\n",
         la, la);
 
-    real *A_tri_diag = calloc(la * lab, real_size);
+    real *A_tri_diag = calloc(la * lab + la, real_size);
     real *x_tri_diag = calloc(la, real_size);
     real *y_tri_diag = calloc(la, real_size);
 
@@ -96,6 +97,14 @@ int main(int argc, char *argv[]) {
 
     random_dense_matrix(la, A_dense);
     tri_diag_matrix_from_dense(blas_order, A_tri_diag, A_dense, la);
+    if (la > 10) {
+        printf(
+            "[NOTE]: Prints of matrix are disabled when using a size greater "
+            "than 10.\n");
+    } else {
+        print_dense_matrix(A_dense, la);
+        print_tri_diag_matrix(A_tri_diag, la);
+    }
 
     for (unsigned i = 0; i < la; i++) {
         real tmp_x = randreal();
@@ -121,8 +130,8 @@ int main(int argc, char *argv[]) {
     cblas_dgemv(blas_order, CblasNoTrans, la, la, alpha, A_dense, la, x_dense,
                 1, beta, y_dense, 1);
 
-    print_vector(y_tri_diag, la);
-    print_vector(y_dense, la);
+    // print_vector(y_tri_diag, la);
+    // print_vector(y_dense, la);
 
     real diff = .0;
     for (size_t i = 0; i < la; i++) diff += fabs(y_dense[i] - y_tri_diag[i]);
