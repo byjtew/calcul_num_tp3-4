@@ -75,7 +75,7 @@ void random_dense_matrix(size_t n, real *A_dense) {
 }
 
 int main(int argc, char *argv[]) {
-    int la = 6;
+    int la = 64;
     int ku = 1, kl = 1, kv = 0, lab = 0;
     CBLAS_ORDER blas_order = CblasColMajor;
 
@@ -128,25 +128,18 @@ int main(int argc, char *argv[]) {
     for (size_t i = 0; i < la; i++) diff += fabs(y_dense[i] - y_tri_diag[i]);
     diff /= (real)la;
 
-    if (diff <= 1e-15)
-        printf(
-            "Les vecteurs y_tri_diag et y_dense sont egaux: mean absolute "
-            "difference = %lf\n",
-            diff);
-    else
-        printf(
-            "Les vecteurs y_tri_diag et y_dense ne sont pas egaux: mean "
-            "absolute difference = %lf\n",
-            diff);
+    printf("Mean absolute difference between results = %lf\n", diff);
 
     real norme_y_tri_diag = cblas_dnrm2(la, y_tri_diag, 1);
-    real norme_y_dense = cblas_dnrm2(la, y_dense, 1);
-
     printf("Norme y_tri_diag : %lf\n", norme_y_tri_diag);
+    real norme_y_dense = cblas_dnrm2(la, y_dense, 1);
     printf("Norme y_dense : %lf\n", norme_y_dense);
+
+    printf("Mean absolute difference between norms = %lf\n",
+           fabs(norme_y_dense - norme_y_tri_diag));
     fflush(stdout);
 
-    printf("\n--------- End -----------\n");
+    printf("\n=== End ===n");
 
     free(A_tri_diag);
     free(x_tri_diag);
