@@ -39,7 +39,7 @@ OBJTP2ITER= lib_poisson1D.o tp2_poisson1D_iter.o
 OBJTP2DIRECT= lib_poisson1D.o tp2_poisson1D_direct.o
 #
 
-all: bin/tp_testenv bin/tp2poisson1D_iter bin/tp2poisson1D_direct bin/tp4_ex5 bin/tp5_ex5 bin/dgbmv check
+all: bin/tp_testenv bin/tp2poisson1D_iter bin/tp2poisson1D_direct bin/tp4_ex5 bin/dgbmv check
 
 testenv: bin/tp_testenv
 
@@ -75,11 +75,11 @@ bin/tp2poisson1D_direct: $(OBJTP2DIRECT)
 bin/tp4_ex5: $(TPDIRSRC)/TP4_ex5.c
 	$(CC) -o bin/tp4_ex5 $(TPDIRSRC)/TP4_ex5.c $(OPTC)
 
-bin/tp5_ex5: $(TPDIRSRC)/TP5_ex5.c
-	$(CC) -o bin/tp5_ex5 $(TPDIRSRC)/TP5_ex5.c $(OPTC)
-
 bin/tp4_ex1: $(TPDIRSRC)/TP4_ex1.sci
 	scilab-cli -f $(TPDIRSRC)/TP4_ex1.sci -quit
+
+bin/tp5_ex5: $(TPDIRSRC)/TP4_ex1.sci
+	scilab-cli -f $(TPDIRSRC)/TP5_ex5.sci -quit
 
 bin/dgbmv: dgbmv.o
 	$(CC) -o bin/dgbmv $(OPTC) dgbmv.o $(LIBS)
