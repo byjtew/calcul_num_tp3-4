@@ -75,11 +75,11 @@ bin/tp2poisson1D_direct: $(OBJTP2DIRECT)
 bin/tp4_ex5: $(TPDIRSRC)/TP4_ex5.c
 	$(CC) -o bin/tp4_ex5 $(TPDIRSRC)/TP4_ex5.c $(OPTC)
 
-bin/tp4_ex1: $(TPDIRSRC)/TP4_ex1.sci
-	scilab-cli -f $(TPDIRSRC)/TP4_ex1.sci -quit
+bin/LDLt: $(TPDIRSRC)/LDLt.sci
+	scilab-cli -f $(TPDIRSRC)/LDLt.sci -quit
 
-bin/tp5_ex5: $(TPDIRSRC)/TP4_ex1.sci
-	scilab-cli -f $(TPDIRSRC)/TP5_ex5.sci -quit
+bin/LU_tri_diag: $(TPDIRSRC)/LU_tri_diag.sci
+	scilab-cli -f $(TPDIRSRC)/LU_tri_diag.sci -quit
 
 bin/dgbmv: dgbmv.o
 	$(CC) -o bin/dgbmv $(OPTC) dgbmv.o $(LIBS)
