@@ -8,7 +8,7 @@ disp(A)
 // 	6.1237244 	4.1833001 	0.
 // 	22.453656   20.916501   6.1101009
 
-function [L, D] = llt(A)
+function [L] = llt(A)
 	n = size(A)(1)
 	D = eye(n, n)
 	L = eye(n,n)
@@ -28,22 +28,56 @@ function [L, D] = llt(A)
 				end
 			end
 		end
+		L = L + D - eye(n ,n)
+	else
+		disp("The matrix A needs to be a square matrix")
+	end
+endfunction
+
+function [L,D] = ldlt(A)
+	n = size(A)(1)
+	D = eye(n, n)
+	L = eye(n,n)
+	if (n == size(A)(2))
+		for i = 1:n
+			for j = 1:n
+				sum = 0.0
+				for k = 1:(j-1)
+					sum = sum + L(j,k) * L(j,k) * D(k,k)
+				end
+				D(j,j) = A(j,j) - sum
+				if i > j then
+					sum = 0.0	
+					for k = 1:(j-1)
+						sum = sum + L(i,k) * L(j,k) * D(k,k)
+					end
+					L(i,j) = (A(i,j) - sum) / D(j,j)
+				end
+			end
+		end
 	else
 		disp("The matrix A needs to be a square matrix")
 	end
 endfunction
 
 
-[L,D] = llt(A)
+[L] = llt(A)
+printf("\n# L:")
+disp(L)
+
+printf("\n# Cholesky LLt:")
+disp(L*L')
+
+
+[L,D] = ldlt(A)
 printf("\n# L:")
 disp(L)
 printf("\n# D:")
 disp(D)
 
-LD = L+D-eye(size(A)(1), size(A)(1))
-printf("\n# Cholesky LLt:")
-disp(LD*LD')
 printf("\n# LDLt:")
-disp(L*D*(L'))
+disp(L*D*L')
+
+
 printf("\n# A:")
 disp(A)
