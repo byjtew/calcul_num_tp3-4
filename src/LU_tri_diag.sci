@@ -24,7 +24,7 @@ function [L,U] = split_dense_in_LU(A_dense)
 	U(n,n) = A_dense(n,n)
 endfunction
 
-function [A] = random_tri_diag(n)
+function [A] = random_tri_diag_matrix(n)
 	A = rand(3,n)
 	A(1) = 0
 	A(3*n) = 0
@@ -32,7 +32,7 @@ endfunction
 
 
 n=6
-A = random_tri_diag(n)
+A = random_tri_diag_matrix(n)
 printf("\n# A:")
 disp(A)
 
