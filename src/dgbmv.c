@@ -2,6 +2,7 @@
 
 #include "blaslapack_headers.h"
 #include "math.h"
+#include "time.h"
 
 typedef double real;
 const size_t real_size = sizeof(real);
@@ -87,6 +88,7 @@ int main(int argc, char *argv[]) {
         "formats) ===\n\n",
         la, la);
 
+    srand(time(NULL));
     real *A_tri_diag = calloc(la * lab + la, real_size);
     real *x_tri_diag = calloc(la, real_size);
     real *y_tri_diag = calloc(la, real_size);
