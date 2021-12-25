@@ -171,9 +171,10 @@ int main(int argc, char** argv) {
     print_vec(res_vec_ptr, 5);
 
     // RANDOM MATRIX PART
-    printf("\n\n--- Random generated [%dx%d] matrix ---\n", TEST_DIMENSION, TEST_DIMENSION);
+    double null_proportion = .75;
+    printf("\n\n--- Random generated [%dx%d] matrix with %.2f%% of null values ---\n", TEST_DIMENSION, TEST_DIMENSION, 100.0*null_proportion);
     srand(time(NULL));
-    mat_csr_t random_csr = create_random_csr_t(TEST_DIMENSION, .75);
+    mat_csr_t random_csr = create_random_csr_t(TEST_DIMENSION, null_proportion);
 
     // Question 1:
     printf("\n--- Question 1: Vector.ONE ---\n");
