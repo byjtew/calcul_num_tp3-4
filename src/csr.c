@@ -6,12 +6,11 @@
 #include <time.h>
 
 #define NULL_VALUE 0.0
-#define TEST_DIMENSION 5000  // Must be a multiple of 3
+#define TEST_DIMENSION 5000
 
 //
-double randreal() {
-    int a = rand() % 1000000;
-    return ((double)a / 100000);
+double randrealf() {
+    return ((double)rand() / RAND_MAX);
 }
 
 /**
@@ -94,7 +93,7 @@ mat_csr_t create_empty_mat_csr_t(size_t row) {
     return mat;
 }
 
-mat_csr_t mat_csr_t_from(double* mat_full, size_t row, size_t col) {
+mat_csr_t mat_csr_t_from_dense(double* mat_full, size_t row, size_t col) {
     mat_csr_t mat = create_empty_mat_csr_t(row);
 
     for (size_t r = 0; r < row; r++) {
@@ -124,8 +123,8 @@ mat_csr_t create_random_csr_t(size_t n, double percent_of_zeros) {
     size_t nb_of_zeros = (size_t)(percent_of_zeros * n * n);
     double* full_mat = (double*)calloc(n * n, sizeof(double));
     for (size_t i = 0; i < nb_of_zeros; i++)
-        full_mat[rand() % (n * n)] = randreal();
-    mat_csr_t mat = mat_csr_t_from(full_mat, n, n);
+        full_mat[rand() % (n * n)] = randrealf();
+    mat_csr_t mat = mat_csr_t_from_dense(full_mat, n, n);
     free(full_mat);
     return mat;
 }
@@ -137,7 +136,7 @@ void print_vec(double* v, size_t n) {
     printf("]\n");
 }
 
-void mat_csr_t_dot_vec(mat_csr_t* mat, size_t n, double* vec, double* res_vec) {
+void mat_csr_mult_vec(mat_csr_t* mat, size_t n, double* vec, double* res_vec) {
     for (size_t r = 0; r < n; r++) {
         res_vec[r] = .0;
         for (size_t i = mat->IA[r]; i < mat->IA[r + 1]; i++)
@@ -152,9 +151,9 @@ int main(int argc, char** argv) {
 
     // Saad CSR PART
     double saad_example[25] = {1.0, 0, 0, 2, 0,  3,  4, 0, 5, 0, 6, 0, 7,
-                               8,   9, 0, 0, 10, 11, 0, 0, 0, 0, 0, 12};
+                               8, 9, 0, 0, 10, 11, 0, 0, 0, 0, 0, 12};
     double* saad_ptr = saad_example;
-    mat_csr_t saad_csr = mat_csr_t_from(saad_ptr, 5, 5);
+    mat_csr_t saad_csr = mat_csr_t_from_dense(saad_ptr, 5, 5);
     printf("--- Saad example matrix ---\n");
     print_mat_csr_t(&saad_csr);
     print_mat_csr_t_full(&saad_csr);
@@ -165,7 +164,7 @@ int main(int argc, char** argv) {
     double res_vec[5] = {0.0};
     double* res_vec_ptr = res_vec;
 
-    mat_csr_t_dot_vec(&saad_csr, 5, two_vec_ptr, res_vec_ptr);
+    mat_csr_mult_vec(&saad_csr, 5, two_vec_ptr, res_vec_ptr);
     printf(
         "\n\n--- Multiplication of Saad example matrix by (2, ..., 2) "
         "vector:\n");
@@ -185,10 +184,10 @@ int main(int argc, char** argv) {
 
     // print_vec(one_vec_ptr, TEST_DIMENSION);
     for (size_t i = 0; i < TEST_DIMENSION; i++) res_vector_ptr[i] = .0;
-    printf("\n-- Random [%dx%d] CSR matrix DOT Vector (1, 1, ...., 1)[%d] --\n",
+    printf("\n-- Random [%dx%d] CSR matrix MULT Vector (1, 1, ...., 1)[%d] --\n",
            TEST_DIMENSION, TEST_DIMENSION, TEST_DIMENSION);
     start = omp_get_wtime();
-    mat_csr_t_dot_vec(&random_csr, TEST_DIMENSION, one_vec_ptr, res_vector_ptr);
+    mat_csr_mult_vec(&random_csr, TEST_DIMENSION, one_vec_ptr, res_vector_ptr);
     // print_vec(res_vector_ptr, TEST_DIMENSION);
     end = omp_get_wtime();
     printf("-- Took %lf ms --\n", 1e3 * (end - start));
@@ -202,11 +201,11 @@ int main(int argc, char** argv) {
     // print_vec(one_zero_zero_vec_ptr, TEST_DIMENSION);
     for (size_t i = 0; i < TEST_DIMENSION; i++) res_vector_ptr[i] = .0;
     printf(
-        "\n-- Random [%dx%d] CSR matrix DOT Vector (1, 0, 0, 1, 0, 0, ...., 1, "
+        "\n-- Random [%dx%d] CSR matrix MULT Vector (1, 0, 0, 1, 0, 0, ...., 1, "
         "0, 0)[%d] --\n",
         TEST_DIMENSION, TEST_DIMENSION, TEST_DIMENSION);
     start = omp_get_wtime();
-    mat_csr_t_dot_vec(&random_csr, TEST_DIMENSION, one_zero_zero_vec_ptr,
+    mat_csr_mult_vec(&random_csr, TEST_DIMENSION, one_zero_zero_vec_ptr,
                       res_vector_ptr);
     // print_vec(res_vector_ptr, TEST_DIMENSION);
     end = omp_get_wtime();
