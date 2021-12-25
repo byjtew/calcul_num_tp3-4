@@ -50,7 +50,6 @@ function [retA] = lu_tri_diag(A_tri_diag)
 	else
 		disp("The matrix A needs to be in tri-diagonal format")
 	end
-
 endfunction
 
 
@@ -70,3 +69,17 @@ disp(L*U)
 
 printf("\n# A_dense:")
 disp(A_dense)
+
+printf("\n# difference A_dense & L*U:")
+disp(norm(A_dense) - norm(L*U))
+
+mean_cost = 0.0
+for s = 250:+250:10000
+	printf("\n-- Size %d: ", s)
+	timer()
+	[LU_A] = lu_tri_diag(random_tri_diag_matrix(s))
+	t = timer()
+	mean_cost = mean_cost + t/s
+	printf(" %f seconds --", t)
+end
+printf("\nmean cost per size unit: %f seconds\n\n", mean_cost)
