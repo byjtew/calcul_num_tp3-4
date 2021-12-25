@@ -68,7 +68,6 @@ disp(L)
 printf("\n# Cholesky LLt:")
 disp(L*L')
 
-
 [L,D] = ldlt(A)
 printf("\n# L:")
 disp(L)
@@ -81,3 +80,22 @@ disp(L*D*L')
 
 printf("\n# A:")
 disp(A)
+
+printf("\n# difference A & LDLt:")
+disp(norm(A) - norm(L*D*L'))
+
+mean_cost_lu = 0.0
+mean_cost_ldlt = 0.0
+for s = 10:+2:50
+	printf("\n-- Size %d: \t", s)
+	timer()
+	A = rand(s,s)
+	[L,D] = ldlt(A)
+	t = timer()
+	printf("\tLDLt: %f sec", t)
+	mean_cost_ldlt  = mean_cost_ldlt + t/s
+	[L,U] = lu(A)
+	printf("\tLU: %f sec\t--", t)
+	mean_cost_lu = mean_cost_lu + t/s
+end
+printf("\nMean cost per size unit for:\n\tLDLt : %f seconds\n\tLU : %f seconds\n\n", mean_cost_ldlt, mean_cost_lu)
