@@ -8,6 +8,30 @@ disp(A)
 // 	6.1237244 	4.1833001 	0.
 // 	22.453656   20.916501   6.1101009
 
+function [L, U] = mylu3b(A)
+    [n,n_check] = size(A)
+    L = zeros(n,n)
+    U = zeros(n,n)
+
+    if n == n_check then
+        for k = 1:(n-1)
+            for i = (k+1):n
+                A(i,k) = A(i,k)/A(k,k)
+            end
+            for i = (k+1):n
+                for j = (k+1):n
+                    A(i,j) = A(i,j) - A(i,k) * A(k,j)
+                end
+            end
+        end
+        L = tril(A)
+        for i = 1:n
+            L(i,i) = 1
+        end
+        U = triu(A)
+    end
+endfunction
+
 function [L] = llt(A)
 	n = size(A)(1)
 	D = eye(n, n)
@@ -86,15 +110,20 @@ disp(norm(A) - norm(L*D*L'))
 
 mean_cost_lu = 0.0
 mean_cost_ldlt = 0.0
-for s = 10:+2:50
+for s = 26:+2:50
 	printf("\n-- Size %d: \t", s)
 	timer()
 	A = rand(s,s)
 	[L,D] = ldlt(A)
 	t = timer()
+	//disp(norm(A) - norm(L*D*L'))
 	printf("\tLDLt: %f sec", t)
 	mean_cost_ldlt  = mean_cost_ldlt + t/s
-	[L,U] = lu(A)
+
+	timer()
+	[L,U] = mylu3b(A)
+	t = timer()
+	//disp(norm(A) - norm(L*U))
 	printf("\tLU: %f sec\t--", t)
 	mean_cost_lu = mean_cost_lu + t/s
 end
