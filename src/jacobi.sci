@@ -96,6 +96,25 @@ function [x] = gauss_seidel(A, b)
     printf("\n< gauss_seidel(...) in %d iterations.\n", nb_iter)
 endfunction
 
+function [x] = richardson(A, b, alpha)
+    printf("\n> richardson(.., alpha=%f)", alpha)
+    nb_iter = 0
+    x_exact = A\b
+    n = size(A_dense)(1)
+    x = zeros(n, 1)
+    D_p_L = tril(A)
+    U = triu(A, +1)
+
+    // alpha_optimal = .5 * (lambda_min(A) + lambda_max(A))
+    
+    while abs(norm(A\b) - norm(x)) >= 1e-7 then
+        x = x + alpha * (b - A * x)
+        //printf("\nDifference is: %f ", abs(norm(x_exact) - norm(x)))
+        nb_iter = nb_iter + 1
+    end
+    printf("\n< richardson(.., alpha=%f) in %d iterations.\n", alpha, nb_iter)
+endfunction
+
 
 n=6
 A = random_strictly_dominant_tri_diag(n)
@@ -111,15 +130,17 @@ disp(b)
 
 
 [x] = jacobi(A_dense, b)
-printf("\n# x:")
+printf("\n# x_jacobi:")
 disp(x)
 
 [x] = gauss_seidel(A_dense, b)
-printf("\n# x:")
+printf("\n# x_gauss_seidel:")
 disp(x)
 
-printf("\n# A_dense*x:")
-disp(A_dense*x)
+[x] = richardson(A_dense, b, .5)
+printf("\n# x_richardson:")
+disp(x)
 
-printf("\n# b:")
-disp(b)
+x_exact = A_dense\b
+printf("\n# x_exact:")
+disp(x_exact)
