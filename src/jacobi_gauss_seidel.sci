@@ -58,7 +58,7 @@ function [A] = random_strictly_dominant_dense(n)
 
 endfunction
 
-function [x] = jacobi(A, b)
+function [x, nb_iter] = jacobi(A, b)
     printf("\n> jacobi(...)")
     nb_iter = 0
     x_exact = A\b
@@ -79,7 +79,7 @@ function [x] = jacobi(A, b)
     printf("\n< jacobi(...) in %d iterations.\n", nb_iter)
 endfunction
 
-function [x] = gauss_seidel(A, b)
+function [x, nb_iter] = gauss_seidel(A, b)
     printf("\n> gauss_seidel(...)")
     nb_iter = 0
     x_exact = A\b
@@ -96,7 +96,7 @@ function [x] = gauss_seidel(A, b)
     printf("\n< gauss_seidel(...) in %d iterations.\n", nb_iter)
 endfunction
 
-function [x] = richardson(A, b, alpha)
+function [x, nb_iter] = richardson(A, b, alpha)
     printf("\n> richardson(.., alpha=%f)", alpha)
     nb_iter = 0
     x_exact = A\b
@@ -129,18 +129,36 @@ printf("\n# b:")
 disp(b)
 
 
-[x] = jacobi(A_dense, b)
+[x, nb_iter_jacobi] = jacobi(A_dense, b)
 printf("\n# x_jacobi:")
 disp(x)
 
-[x] = gauss_seidel(A_dense, b)
+[x, nb_iter_gauss_seidel] = gauss_seidel(A_dense, b)
 printf("\n# x_gauss_seidel:")
 disp(x)
 
-[x] = richardson(A_dense, b, .5)
+[x, nb_iter_richardson] = richardson(A_dense, b, .5)
 printf("\n# x_richardson:")
 disp(x)
 
 x_exact = A_dense\b
 printf("\n# x_exact:")
 disp(x_exact)
+
+
+fp = mopen("jacobi_gauss_seidel_results.dat", "wb")
+nb_repetitions = 10
+for n = 3:100
+    mean_jacobi = 0.0
+    mean_gauss_seidel = 0.0
+    for r = 1:nb_repetitions
+        A_dense = tri_diag_to_dense(random_strictly_dominant_tri_diag(n))
+        b = rand(n,1)
+        [x, nb_iter_jacobi] = jacobi(A_dense, b)
+        mean_jacobi = mean_jacobi + nb_iter_jacobi
+        [x, nb_iter_gauss_seidel] = gauss_seidel(A_dense, b)
+        mean_gauss_seidel = mean_gauss_seidel + nb_iter_gauss_seidel
+    end
+    mfprintf(fp, "%d %f %f\n", n, mean_jacobi/nb_repetitions, mean_gauss_seidel/nb_repetitions)
+end
+mclose(fp)

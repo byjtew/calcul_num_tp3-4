@@ -81,8 +81,8 @@ bin/LDLt: $(TPDIRSRC)/LDLt.sci
 bin/LU_tri_diag: $(TPDIRSRC)/LU_tri_diag.sci
 	scilab-cli -f $(TPDIRSRC)/LU_tri_diag.sci -quit
 
-bin/jacobi: $(TPDIRSRC)/jacobi.sci
-	scilab-cli -f $(TPDIRSRC)/jacobi.sci -quit
+bin/jacobi_gauss_seidel: $(TPDIRSRC)/jacobi_gauss_seidel.sci
+	scilab-cli -f $(TPDIRSRC)/jacobi_gauss_seidel.sci -quit
 
 
 bin/dgbmv: dgbmv.o
