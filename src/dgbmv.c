@@ -73,15 +73,15 @@ void random_dense_matrix(size_t n, real *A_dense) {
 
 int main(int argc, char *argv[]) {
     size_t la = argc > 1 ? atol(argv[1]) : 8;
-    int ku = 1, kl = 1, kv = 0, lab = 0;
-    CBLAS_ORDER blas_order = CblasColMajor;
+    int ku = 1, kl = 1, lab = 0;
+    CBLAS_ORDER blas_order = CblasRowMajor;
 
     if (argc < 2)
         printf(
             "[USAGE]: %s [optional: leading dimension of the matrix, "
             "default: 10]\n\n", argv[0]);
 
-    lab = kv + kl + ku + 1;
+    lab = kl + ku + 1;
 
     printf(
         "=== Generation of a random (%ldx%ld) matrix (dense & tri_diagonal "
@@ -99,6 +99,7 @@ int main(int argc, char *argv[]) {
 
     random_dense_matrix(la, A_dense);
     tri_diag_matrix_from_dense(blas_order, A_tri_diag, A_dense, la);
+
     if (la > 10) {
         printf(
             "[NOTE]: Prints of matrix are disabled when using a size greater "
@@ -126,7 +127,9 @@ int main(int argc, char *argv[]) {
                 lab, x_tri_diag, 1, beta, y_tri_diag, 1);
 
     printf(
-        "\n=== Check result by comparing DGEMV result and DGBMV result "
+        "\n=== Order: %s ===\n", blas_order == CblasColMajor ? "Col-Major" : "Row-Major");
+    printf(
+        "=== Check result by comparing DGEMV result and DGBMV result "
         "===\n\n");
 
     cblas_dgemv(blas_order, CblasNoTrans, la, la, alpha, A_dense, la, x_dense,
@@ -137,16 +140,16 @@ int main(int argc, char *argv[]) {
 
     real diff = .0;
     for (size_t i = 0; i < la; i++) diff += fabs(y_dense[i] - y_tri_diag[i]);
-    diff /= (real)la;
+    diff /= (real)3.0*la;
 
-    printf("Mean absolute difference between results = %lf\n", diff);
+    printf("Mean absolute relative difference between results = %lf\n", diff);
 
     real norme_y_tri_diag = cblas_dnrm2(la, y_tri_diag, 1);
     printf("Norme y_tri_diag : %lf\n", norme_y_tri_diag);
     real norme_y_dense = cblas_dnrm2(la, y_dense, 1);
     printf("Norme y_dense : %lf\n", norme_y_dense);
 
-    printf("Mean absolute difference between norms = %lf\n",
+    printf("Mean absolute relative difference between norms = %lf\n",
            fabs(norme_y_dense - norme_y_tri_diag));
     fflush(stdout);
 
