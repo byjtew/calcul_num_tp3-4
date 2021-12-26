@@ -30,6 +30,16 @@ function [A] = random_tri_diag(n)
 	A(3*n) = 0
 endfunction
 
+function [A] = poisson_1d_dense(n) 
+    A = zeros(n,n)
+    A(1,1) = 2
+    for i = 2:n
+        A(i-1, i) = -1
+        A(i, i-1) = -1
+        A(i,i) = 2
+    end
+endfunction
+
 
 function [A] = random_strictly_dominant_tri_diag(n)
 	A = rand(3,n)
@@ -59,7 +69,6 @@ function [A] = random_strictly_dominant_dense(n)
 endfunction
 
 function [x, nb_iter] = jacobi(A, b)
-    printf("\n> jacobi(...)")
     nb_iter = 0
     x_exact = A\b
     n = size(A_dense)(1)
@@ -76,11 +85,10 @@ function [x, nb_iter] = jacobi(A, b)
         //printf("\nDifference is: %f ", abs(norm(A\b) - norm(x)))
         nb_iter = nb_iter + 1
     end
-    printf("\n< jacobi(...) in %d iterations.\n", nb_iter)
+    printf("<> jacobi(A[%d,%d], b) in %d iterations.\n", n, n, nb_iter)
 endfunction
 
 function [x, nb_iter] = gauss_seidel(A, b)
-    printf("\n> gauss_seidel(...)")
     nb_iter = 0
     x_exact = A\b
     n = size(A_dense)(1)
@@ -93,11 +101,20 @@ function [x, nb_iter] = gauss_seidel(A, b)
         //printf("\nDifference is: %f ", abs(norm(x_exact) - norm(x)))
         nb_iter = nb_iter + 1
     end
-    printf("\n< gauss_seidel(...) in %d iterations.\n", nb_iter)
+    printf("<> gauss_seidel(A[%d,%d], b) in %d iterations.\n", n, n, nb_iter)
+endfunction
+
+function [rho] =  spectral_radius(A_dense)
+    rho = max(real(spec(A_dense)))
+endfunction
+
+function [mini, maxi] =  min_max_eigenvalue(A_dense)
+    eigenvalues = real(spec(A_dense))
+    maxi = max(eigenvalues)
+    mini = min(eigenvalues)
 endfunction
 
 function [x, nb_iter] = richardson(A, b, alpha)
-    printf("\n> richardson(.., alpha=%f)", alpha)
     nb_iter = 0
     x_exact = A\b
     n = size(A_dense)(1)
@@ -105,14 +122,16 @@ function [x, nb_iter] = richardson(A, b, alpha)
     D_p_L = tril(A)
     U = triu(A, +1)
 
+    max_iter = 5000
+
     // alpha_optimal = .5 * (lambda_min(A) + lambda_max(A))
     
-    while abs(norm(A\b) - norm(x)) >= 1e-7 then
+    while abs(norm(A\b) - norm(x)) >= 1e-7 && nb_iter < max_iter then
         x = x + alpha * (b - A * x)
         //printf("\nDifference is: %f ", abs(norm(x_exact) - norm(x)))
         nb_iter = nb_iter + 1
     end
-    printf("\n< richardson(.., alpha=%f) in %d iterations.\n", alpha, nb_iter)
+    printf("<> richardson(A[%d,%d], b, alpha=%f) in %d iterations.\n", n, n, alpha, nb_iter)
 endfunction
 
 
@@ -145,20 +164,33 @@ x_exact = A_dense\b
 printf("\n# x_exact:")
 disp(x_exact)
 
+eigenvalues = spec(A_dense)
+printf("\n# eigenvalues:")
+disp(eigenvalues)
 
-fp = mopen("jacobi_gauss_seidel_results.dat", "wb")
+fp = mopen("jacobi_gauss_seidel_richardson_results.dat", "wb")
 nb_repetitions = 10
-for n = 3:100
+for n = 3:25
     mean_jacobi = 0.0
     mean_gauss_seidel = 0.0
+    mean_richardson = 0.0
     for r = 1:nb_repetitions
-        A_dense = tri_diag_to_dense(random_strictly_dominant_tri_diag(n))
+        //A_dense = tri_diag_to_dense(random_strictly_dominant_tri_diag(n))
+        A_dense = poisson_1d_dense(n)
         b = rand(n,1)
+
         [x, nb_iter_jacobi] = jacobi(A_dense, b)
         mean_jacobi = mean_jacobi + nb_iter_jacobi
+
         [x, nb_iter_gauss_seidel] = gauss_seidel(A_dense, b)
         mean_gauss_seidel = mean_gauss_seidel + nb_iter_gauss_seidel
+
+        [min_eigen, max_eigen] = min_max_eigenvalue(A_dense)
+        alpha = 2.0/(max_eigen+min_eigen)
+        [x, nb_iter_richardson] = richardson(A_dense, b, alpha)        
+        mean_richardson = mean_richardson + nb_iter_richardson
     end
-    mfprintf(fp, "%d %f %f\n", n, mean_jacobi/nb_repetitions, mean_gauss_seidel/nb_repetitions)
+    printf("%f %%\n", 100.0*n/20.0)
+    mfprintf(fp, "%d %f %f %f\n", n, mean_jacobi/nb_repetitions, mean_gauss_seidel/nb_repetitions, mean_richardson/nb_repetitions)
 end
 mclose(fp)
